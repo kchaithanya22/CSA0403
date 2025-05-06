@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+struct Process {
+    int pid;
+    int burst_time;
+    int priority;
+    int waiting_time;
+    int turnaround_time;
+};
+
+// Function to sort processes by priority (lower value = higher priority)
+void sort_by_priority(struct Process p[], int n) {
+    struct Process temp;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (p[i].priority > p[j].priority) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+}
+
+void calculate_waiting_and_turnaround(struct Process p[], int n) {
+    p[0].waiting_time = 0;
+    for (int i = 1; i < n; i++) {
+        p[i].waiting_time = p[i - 1].waiting_time + p[i - 1].burst_time;
+    }
+
+    for (int i = 0; i < n; i++) {
+        p[i].turnaround_time = p[i].waiting_time + p[i].burst_time;
+    }
+}
+
+void display_processes(struct Process p[], int n) {
+    float total_wt = 0, total_tat = 0;
+    printf("\nPID\tPriority\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t%d\t\t%d\t\t%d\t\t%d\n", 
+               p[i].pid, p[i].priority, p[i].
