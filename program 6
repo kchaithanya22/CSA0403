@@ -1,0 +1,79 @@
+#include <stdio.h>
+
+#define MAX 100
+
+struct Process {
+    int pid;
+    int burstTime;
+    int remainingTime;
+    int priority;
+    int arrivalTime;
+    int completionTime;
+    int waitingTime;
+    int turnaroundTime;
+    int finished;
+};
+
+int main() {
+    struct Process p[MAX];
+    int n, time = 0, completed = 0;
+    int highestPriority, index;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    // Input process info
+    for (int i = 0; i < n; i++) {
+        p[i].pid = i + 1;
+        printf("\nProcess %d:\n", p[i].pid);
+        printf("Enter arrival time: ");
+        scanf("%d", &p[i].arrivalTime);
+        printf("Enter burst time: ");
+        scanf("%d", &p[i].burstTime);
+        printf("Enter priority (lower = higher priority): ");
+        scanf("%d", &p[i].priority);
+        p[i].remainingTime = p[i].burstTime;
+        p[i].finished = 0;
+    }
+
+    while (completed != n) {
+        highestPriority = 9999;
+        index = -1;
+
+        // Find highest-priority ready process
+        for (int i = 0; i < n; i++) {
+            if (p[i].arrivalTime <= time && p[i].remainingTime > 0 && p[i].priority < highestPriority) {
+                highestPriority = p[i].priority;
+                index = i;
+            }
+        }
+
+        if (index != -1) {
+            p[index].remainingTime--;
+
+            if (p[index].remainingTime == 0) {
+                p[index].completionTime = time + 1;
+                p[index].turnaroundTime = p[index].completionTime - p[index].arrivalTime;
+                p[index].waitingTime = p[index].turnaroundTime - p[index].burstTime;
+                p[index].finished = 1;
+                completed++;
+            }
+        }
+
+        time++;
+    }
+
+    float avgWT = 0, avgTAT = 0;
+
+    printf("\nPID\tAT\tBT\tPR\tCT\tTAT\tWT\n");
+    for (int i = 0; i < n; i++) {
+        avgWT += p[i].waitingTime;
+        avgTAT += p[i].turnaroundTime;
+        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\n", p[i].pid, p[i].arrivalTime, p[i].burstTime, p[i].priority, p[i].completionTime, p[i].turnaroundTime, p[i].waitingTime);
+    }
+
+    printf("\nAverage Waiting Time = %.2f", avgWT / n);
+    printf("\nAverage Turnaround Time = %.2f\n", avgTAT / n);
+
+    return 0;
+}
