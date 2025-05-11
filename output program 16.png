@@ -1,0 +1,34 @@
+-- Employee Record System (Random Access) --
+1. Add Employee
+2. Display Employees
+3. Search Employee by ID
+4. Update Employee
+5. Delete Employee
+6. Exit
+Enter your choice: 1
+Enter Employee ID: 101
+Enter Name: John
+Enter Salary: 50000
+Employee added successfully.
+
+Enter your choice: 2
+-- Employee List --
+ID: 101, Name: John, Salary: 50000.00
+
+Enter your choice: 3
+Enter Employee ID to search: 101
+Employee Found: ID: 101, Name: John, Salary: 50000.00
+
+Enter your choice: 4
+Enter Employee ID to update: 101
+Enter new name: Johnny
+Enter new salary: 55000
+Employee updated.
+
+Enter your choice: 5
+Enter Employee ID to delete: 101
+Employee deleted (logically).
+
+Enter your choice: 2
+-- Employee List --
+(no output — record was logically deleted)
