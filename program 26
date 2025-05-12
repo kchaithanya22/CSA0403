@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    int fd;
+    ssize_t bytesWritten, bytesRead;
+    char buffer[100];
+    const char *filename = "file1.txt";
+    const char *new_filename = "file2.txt";
+
+    // 1. Create and open file
+    fd = open(filename, O_CREAT | O_RDWR, 0644);
+    if (fd == -1) {
+        perror("open");
+        return 1;
+    }
+
+    // 2. Write to file
+    const char *text = "This is a sample file.\n";
+    bytesWritten = write(fd, text, strlen(text));
+    if (bytesWritten == -1) {
+        perror("write");
+        close(fd);
+        return 1;
+    }
+    printf("Written %zd bytes to %s\n", bytesWritten, filename);
+
+    // 3. Move pointer to beginning
+    if (lseek(fd, 0, SEEK_SET) == -1) {
+        perror("lseek");
+        close(fd);
+        return 1;
+    }
+
+    // 4. Read from file
+    bytesRead = read(fd, buffer, sizeof(buffer) - 1);
+    if (bytesRead == -1) {
+        perror("read");
+        close(fd);
+        return 1;
+    }
+    buffer[bytesRead] = '\0';
+    printf("Read from file: %s", buffer);
+
+    // 5. Close file
+    close(fd);
+
+    // 6. Rename file
+    if (rename(filename, new_filename) == 0) {
+        printf("File renamed to %s\n", new_filename);
+    } else {
+        perror("rename");
+    }
+
+    // 7. Delete file
+    if (unlink(new_filename) == 0) {
+        printf("File %s deleted.\n", new_filename);
+    } else {
+        perror("unlink");
+    }
+
+    return 0;
+}
