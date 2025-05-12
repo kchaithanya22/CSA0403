@@ -1,0 +1,50 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) {
+    DIR *dir;
+    struct dirent *entry;
+    struct stat fileStat;
+    char *path;
+
+    // Use current directory if no path provided
+    if (argc < 2) {
+        path = ".";
+    } else {
+        path = argv[1];
+    }
+
+    // Open the directory
+    dir = opendir(path);
+    if (dir == NULL) {
+        perror("opendir");
+        return 1;
+    }
+
+    printf("Listing contents of directory: %s\n", path);
+
+    // Read entries
+    while ((entry = readdir(dir)) != NULL) {
+        char fullpath[1024];
+        snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
+
+        if (stat(fullpath, &fileStat) == 0) {
+            if (S_ISDIR(fileStat.st_mode)) {
+                printf("[DIR ] %s\n", entry->d_name);
+            } else if (S_ISREG(fileStat.st_mode)) {
+                printf("[FILE] %s (%ld bytes)\n", entry->d_name, fileStat.st_size);
+            } else {
+                printf("[OTHR] %s\n", entry->d_name);
+            }
+        } else {
+            perror("stat");
+        }
+    }
+
+    closedir(dir);
+    return 0;
+}
