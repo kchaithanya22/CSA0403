@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_RECORDS 100
+#define MAX_DATA_LENGTH 50
+
+// Structure for each record
+typedef struct {
+    int record_id;
+    char data[MAX_DATA_LENGTH];
+} Record;
+
+// File structure
+typedef struct {
+    Record records[MAX_RECORDS];
+    int total_records;
+} File;
+
+void addRecord(File *file, int id, const char *data) {
+    if (file->total_records >= MAX_RECORDS) {
+        printf("File is full. Cannot add more records.\n");
+        return;
+    }
+    file->records[file->total_records].record_id = id;
+    strcpy(file->records[file->total_records].data, data);
+    file->total_records++;
+}
+
+void readSequentially(File *file) {
+    printf("\nReading file sequentially:\n");
+    for (int i = 0; i < file->total_records; i++) {
+        printf("Record %d: %s\n", file->records[i].record_id, file->records[i].data);
+    }
+}
+
+void readUpToRecord(File *file, int record_number) {
+    if (record_number > file->total_records || record_number <= 0) {
+        printf("Invalid record number.\n");
+        return;
+    }
+
+    printf("\nAccessing record %d requires reading up to it:\n", record_number);
+    for (int i = 0; i < record_number; i++) {
+        printf("Record %d: %s\n", file->records[i].record_id, file->records[i].data);
+    }
+}
+
+int main() {
+    File myFile;
+    myFile.total_records = 0;
+
+    // Simulating adding records
+    addRecord(&myFile, 1, "Header Information");
+    addRecord(&myFile, 2, "User Details");
+    addRecord(&myFile, 3, "Transaction Log");
+    addRecord(&myFile, 4, "Audit Trail");
+
+    // Reading file sequentially
+    readSequentially(&myFile);
+
+    // Reading up to a specific record
+    readUpToRecord(&myFile, 3); // Simulates sequential access
+
+    return 0;
+}
