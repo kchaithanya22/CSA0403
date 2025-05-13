@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+void sort(int arr[], int n) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int request[MAX], n, head, disk_size;
+    int total_movement = 0;
+    int i, j;
+
+    printf("Enter number of disk requests: ");
+    scanf("%d", &n);
+
+    printf("Enter the disk request sequence:\n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &request[i]);
+    }
+
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter total disk size (e.g., 200): ");
+    scanf("%d", &disk_size);
+
+    // Add head and end/start markers
+    request[n] = head;
+    n++;
+
+    sort(request, n);
+
+    // Find index of head in sorted array
+    int index;
+    for (i = 0; i < n; i++) {
+        if (request[i] == head) {
+            index = i;
+            break;
+        }
+    }
+
+    printf("\nOrder of servicing (C-SCAN):\n");
+
+    // Move right from head to end
+    for (i = index; i < n; i++) {
+        printf("%d ", request[i]);
+    }
+
+    // Wrap around to start
+    for (i = 0; i < index; i++) {
+        printf("%d ", request[i]);
+    }
+
+    // Head movement:
+    total_movement += (disk_size - 1 - head);           // Move from head to end
+    total_movement += (disk_size - 1);                  // Jump to 0
+    total_movement += request[index - 1];               // Move from 0 to leftmost request
+
+    printf("\n\nTotal head movement = %d cylinders\n", total_movement);
+    printf("Average head movement = %.2f cylinders\n", (float)total_movement / (n - 1));
+
+    return 0;
+}
