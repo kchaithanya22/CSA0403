@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 100
+#define MAX_FILE_BLOCKS 20
+
+// Simulate disk blocks: 0 = free, 1 = allocated
+int disk[MAX_BLOCKS] = {0};
+
+typedef struct {
+    int indexBlock;
+    int blocks[MAX_FILE_BLOCKS];
+    int blockCount;
+} File;
+
+void allocateFile(File *file, int requiredBlocks) {
+    int i, count = 0;
+
+    // Find index block
+    for (i = 0; i < MAX_BLOCKS; i++) {
+        if (disk[i] == 0) {
+            file->indexBlock = i;
+            disk[i] = 1;  // Mark as allocated
+            break;
+        }
+    }
+
+    if (i == MAX_BLOCKS) {
+        printf("No space for index block.\n");
+        return;
+    }
+
+    // Find data blocks
+    for (i = 0; i < MAX_BLOCKS && count < requiredBlocks; i++) {
+        if (disk[i] == 0) {
+            file->blocks[count++] = i;
+            disk[i] = 1;  // Allocate block
+        }
+    }
+
+    if (count < requiredBlocks) {
+        printf("Not enough space. Rolling back.\n");
+        disk[file->indexBlock] = 0;
+        for (int j = 0; j < count; j++) {
+            disk[file->blocks[j]] = 0;
+        }
+        return;
+    }
+
+    file->blockCount = requiredBlocks;
+    printf("File allocated successfully.\n");
+    printf("Index Block: %d\n", file->indexBlock);
+    printf("Data Blocks: ");
+    for (i = 0; i < file->blockCount; i++) {
+        printf("%d ", file->blocks[i]);
+    }
+    printf("\n");
+}
+
+void displayFile(const File *file) {
+    printf("\n--- File Structure ---\n");
+    printf("Index Block: %d\n", file->indexBlock);
+    for (int i = 0; i < file->blockCount; i++) {
+        printf("Index[%d] -> Block %d\n", i, file->blocks[i]);
+    }
+}
+
+int main() {
+    File myFile;
+
+    int required;
+    printf("Enter number of blocks required for the file: ");
+    scanf("%d", &required);
+
+    if (required > MAX_FILE_BLOCKS) {
+        printf("File too large (max %d blocks allowed).\n", MAX_FILE_BLOCKS);
+        return 1;
+    }
+
+    allocateFile(&myFile, required);
+    displayFile(&myFile);
+
+    return 0;
+}
