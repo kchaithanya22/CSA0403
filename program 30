@@ -1,0 +1,43 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void* thread_function(void* arg) {
+    int *num = (int*) arg;
+    printf("Thread %d: Running\n", *num);
+
+    // Check if the thread is equal to itself
+    if (pthread_equal(pthread_self(), pthread_self())) {
+        printf("Thread %d: Confirmed with pthread_equal()\n", *num);
+    }
+
+    pthread_exit((void*) num);  // Exiting thread and returning value
+}
+
+int main() {
+    pthread_t thread1, thread2;
+    int t1_id = 1, t2_id = 2;
+    void *ret_val1, *ret_val2;
+
+    // (i) pthread_create
+    pthread_create(&thread1, NULL, thread_function, &t1_id);
+    pthread_create(&thread2, NULL, thread_function, &t2_id);
+
+    // (ii) pthread_join
+    pthread_join(thread1, &ret_val1);
+    pthread_join(thread2, &ret_val2);
+
+    printf("Main: Thread 1 exited with value %d\n", *((int*)ret_val1));
+    printf("Main: Thread 2 exited with value %d\n", *((int*)ret_val2));
+
+    // (iii) pthread_equal demonstration
+    if (pthread_equal(thread1, thread2)) {
+        printf("Main: Threads are equal (unexpected)\n");
+    } else {
+        printf("Main: Threads are not equal (expected)\n");
+    }
+
+    return 0;
+}
