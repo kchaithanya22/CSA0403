@@ -1,0 +1,32 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n, i, head, total_movement = 0;
+    int request[100];
+
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+
+    printf("Enter the disk request sequence:\n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &request[i]);
+    }
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    printf("\nOrder of servicing:\n");
+    for (i = 0; i < n; i++) {
+        printf("Move from %d to %d [Distance: %d]\n",
+            head, request[i], abs(head - request[i]));
+        total_movement += abs(head - request[i]);
+        head = request[i];
+    }
+
+    printf("\nTotal head movement = %d cylinders\n", total_movement);
+    printf("Average head movement = %.2f cylinders\n", (float)total_movement / n);
+
+    return 0;
+}
