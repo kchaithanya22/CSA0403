@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 100
+
+// Block structure
+typedef struct Block {
+    int blockNumber;
+    int next;  // Pointer to next block index
+    int used;  // 0 = free, 1 = allocated
+} Block;
+
+// File structure
+typedef struct {
+    int start;
+    int end;
+    int length;
+} File;
+
+// Simulated disk
+Block disk[MAX_BLOCKS];
+
+// Initialize disk blocks
+void initDisk() {
+    for (int i = 0; i < MAX_BLOCKS; i++) {
+        disk[i].blockNumber = i;
+        disk[i].next = -1;
+        disk[i].used = 0;
+    }
+}
+
+// Allocate a block
+int allocateBlock() {
+    for (int i = 0; i < MAX_BLOCKS; i++) {
+        if (disk[i].used == 0) {
+            disk[i].used = 1;
+            return i;
+        }
+    }
+    return -1;  // Disk full
+}
+
+// Allocate file using linked allocation
+int allocateFile(File *file, int numBlocks) {
+    int prev = -1;
+    file->start = -1;
+    file->end = -1;
+
+    for (int i = 0; i < numBlocks; i++) {
+        int newBlock = allocateBlock();
+        if (newBlock == -1) {
+            printf("Disk full. Allocation failed.\n");
+            return 0;
+        }
+
+        if (file->start == -1) {
+            file->start = newBlock;
+        } else {
+            disk[prev].next = newBlock;
+        }
+
+        prev = newBlock;
+    }
+
+    file->end = prev;
+    file->length = numBlocks;
+    return 1;
+}
+
+// Display file structure
+void displayFile(File file) {
+    printf("\n--- File Linked Allocation ---\n");
+    printf("Start Block: %d\n", file.start);
+    printf("End Block  : %d\n", file.end);
+    printf("Block Chain: ");
+
+    int current = file.start;
+    while (current != -1) {
+        printf("%d", current);
+        current = disk[current].next;
+        if (current != -1) printf(" -> ");
+    }
+    printf("\n");
+}
+
+int main() {
+    File myFile;
+    int numBlocks;
+
+    initDisk();
+
+    printf("Enter number of blocks to allocate for the file: ");
+    scanf("%d", &numBlocks);
+
+    if (numBlocks <= 0 || numBlocks > MAX_BLOCKS) {
+        printf("Invalid number of blocks.\n");
+        return 1;
+    }
+
+    if (allocateFile(&myFile, numBlocks)) {
+        displayFile(myFile);
+    }
+
+    return 0;
+}
